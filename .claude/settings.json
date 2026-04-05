@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -qE '^/home/pi/esports-webtool/src/|^/home/pi/esports-webtool/public/' && cd /home/pi/esports-webtool && npm run build 2>&1 || true",
+            "timeout": 60,
+            "statusMessage": "Building..."
+          }
+        ]
+      }
+    ]
+  }
+}
