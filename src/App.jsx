@@ -18,6 +18,7 @@ const STATIONS = [
 ];
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "museum2024";
+const HELPER_PASSWORD = import.meta.env.VITE_HELPER_PASSWORD || "helfer2024";
 
 const RANKS = ["🥇", "🥈", "🥉"];
 
@@ -70,7 +71,7 @@ export default function App() {
   const isTableMode = window.location.pathname === "/table";
 
   const [view, setView] = useState(
-    isHelperMode ? "spielhelfer" : isAdminMode ? "adminLogin" : isTableMode ? "table" : "home"
+    isHelperMode ? "helferLogin" : isAdminMode ? "adminLogin" : isTableMode ? "table" : "home"
   );
   const [players, setPlayers] = useState([]);
   const [scores, setScores] = useState({}); // { playerId: { stationId: score } }
@@ -89,6 +90,8 @@ export default function App() {
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [adminError, setAdminError] = useState("");
+  const [helperPw, setHelperPw] = useState("");
+  const [helperLoginError, setHelperLoginError] = useState("");
 
   // Register form
   const [regNick, setRegNick] = useState("");
@@ -294,6 +297,11 @@ export default function App() {
       setAdminScoreInputs({});
     }
     await loadData();
+  };
+
+  const helferLogin = () => {
+    if (helperPw === HELPER_PASSWORD) { setHelperLoginError(""); setView("spielhelfer"); }
+    else { setHelperLoginError("Falsches Passwort!"); }
   };
 
   const adminLogin = () => {
@@ -838,6 +846,25 @@ export default function App() {
             {leaderboard.length} SPIELER · {STATIONS.length} STATIONEN
           </div>
         )}
+        <Footer />
+      </div>
+    </div>
+  );
+
+  if (view === "helferLogin") return (
+    <div style={s.app}>
+      <div style={s.bg} />
+      <div style={crtStyle} />
+      <div style={s.wrap}>
+        <div style={{ maxWidth: 360, margin: "60px auto" }}>
+          <div style={s.h2}>🧑‍🔧 Spielhelfer Login</div>
+          <div style={s.card}>
+            <label style={s.label}>Passwort</label>
+            <input style={{ ...s.input, marginBottom: 16 }} type="password" value={helperPw} onChange={(e) => setHelperPw(e.target.value)} placeholder="••••••••" onKeyDown={(e) => e.key === "Enter" && helferLogin()} />
+            {helperLoginError && <div style={{ color: "#FF4444", fontSize: 13, marginBottom: 14 }}>⚠ {helperLoginError}</div>}
+            <button style={s.btn("#00FF41")} onClick={helferLogin}>Einloggen</button>
+          </div>
+        </div>
         <Footer />
       </div>
     </div>
