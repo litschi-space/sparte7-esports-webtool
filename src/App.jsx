@@ -17,7 +17,7 @@ const STATIONS = [
   { id: 12, name: "Dance Sim",         game: "Dance Sim",         color: "#FF69B4" },
 ];
 
-const ADMIN_PASSWORD = "museum2024";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "museum2024";
 
 const RANKS = ["🥇", "🥈", "🥉"];
 
