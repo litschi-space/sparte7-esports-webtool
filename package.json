@@ -2,7 +2,9 @@
   "name": "retro-clash-webtool",
   "version": "1.0.0",
   "private": true,
-  "engines": { "node": ">=22.5.0" },
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "dev": "concurrently \"node server/index.js\" \"vite --host\"",
     "build": "vite build",
@@ -13,6 +15,7 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "jsqr": "^1.4.0",
+    "pg": "^8.20.0",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
