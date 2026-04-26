@@ -1,4 +1,4 @@
-# CONTEXT – Arcade Event @ Computer Museum Oldenburg
+# CONTEXT – Retro Clash @ Computer Museum Oldenburg
 
 Dieses Dokument fasst den aktuellen Projektstand zusammen für die Weiterarbeit in Claude Code / VSCode.
 
@@ -6,7 +6,7 @@ Dieses Dokument fasst den aktuellen Projektstand zusammen für die Weiterarbeit 
 
 ## Projektübersicht
 
-**Event:** Arcade Event – E-Sports Retro Gaming Event  
+**Event:** Retro Clash – E-Sports Retro Gaming Event  
 **Ort:** Computer Museum Oldenburg (OCM)  
 **Veranstalter:** Oldenburgisches Staatstheater / Sparte 7
 

@@ -3,22 +3,21 @@ import QRCode from "qrcode";
 import jsQR from "jsqr";
 
 const STATIONS = [
-  { id: 1,  name: "Jupiter Lander",    game: "Jupiter Lander",    color: "#6A5AFF" },
-  { id: 2,  name: "Donkey Kong",       game: "Donkey Kong",       color: "#FF6B35" },
-  { id: 3,  name: "Antarctic Adventure", game: "Antarctic Adventure", color: "#00D4FF" },
-  { id: 4,  name: "Space Invaders",    game: "Space Invaders",    color: "#00FF41" },
-  { id: 5,  name: "Puck Man",          game: "Puck Man",          color: "#FFD700" },
-  { id: 6,  name: "Cosmic Alien",      game: "Cosmic Alien",      color: "#CC44FF" },
-  { id: 7,  name: "Dyna Blaster",      game: "Dyna Blaster",      color: "#FF4444" },
-  { id: 8,  name: "Super Mario Bros 1", game: "Super Mario Bros 1", color: "#FF2222" },
-  { id: 9,  name: "Mine Storm",        game: "Mine Storm",        color: "#00FFCC" },
-  { id: 10, name: "Pong",              game: "Pong",              color: "#EEEEEE" },
-  { id: 11, name: "Donkey Conga",      game: "Donkey Conga",      color: "#FFA500" },
-  { id: 12, name: "Dance Sim",         game: "Dance Sim",         color: "#FF69B4" },
+  { id: 1, name: "Pac-Man", game: "Pac-Man", color: "#FFD700" },
+  { id: 2, name: "Space Invaders", game: "Space Invaders", color: "#00FF41" },
+  { id: 3, name: "Donkey Kong", game: "Donkey Kong", color: "#FF6B35" },
+  { id: 4, name: "Tetris", game: "Tetris", color: "#00D4FF" },
+  { id: 5, name: "Galaga", game: "Galaga", color: "#FF00FF" },
+  { id: 6, name: "Frogger", game: "Frogger", color: "#7FFF00" },
+  { id: 7, name: "Centipede", game: "Centipede", color: "#FF4444" },
+  { id: 8, name: "Asteroids", game: "Asteroids", color: "#AAAAFF" },
+  { id: 9, name: "Missile Command", game: "Missile Command", color: "#FF8C00" },
+  { id: 10, name: "Defender", game: "Defender", color: "#00FFCC" },
+  { id: 11, name: "Robotron", game: "Robotron: 2084", color: "#FF69B4" },
+  { id: 12, name: "Q*bert", game: "Q*bert", color: "#FFA500" },
 ];
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "museum2024";
-const HELPER_PASSWORD = import.meta.env.VITE_HELPER_PASSWORD || "helfer2024";
+const ADMIN_PASSWORD = "museum2024";
 
 const RANKS = ["🥇", "🥈", "🥉"];
 
@@ -71,7 +70,7 @@ export default function App() {
   const isTableMode = window.location.pathname === "/table";
 
   const [view, setView] = useState(
-    isHelperMode ? "helferLogin" : isAdminMode ? "adminLogin" : isTableMode ? "table" : "home"
+    isHelperMode ? "spielhelfer" : isAdminMode ? "adminLogin" : isTableMode ? "table" : "home"
   );
   const [players, setPlayers] = useState([]);
   const [scores, setScores] = useState({}); // { playerId: { stationId: score } }
@@ -90,8 +89,6 @@ export default function App() {
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [adminError, setAdminError] = useState("");
-  const [helperPw, setHelperPw] = useState("");
-  const [helperLoginError, setHelperLoginError] = useState("");
 
   // Register form
   const [regNick, setRegNick] = useState("");
@@ -228,20 +225,8 @@ export default function App() {
     return Object.values(s).reduce((a, b) => a + (parseInt(b) || 0), 0);
   };
 
-  const deleteCurrentPlayer = async (nick) => {
-    try {
-      await fetch("/api/player/self", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gamertag: nick }),
-      });
-    } catch (_) {}
-  };
-
   const registerPlayer = async () => {
     if (!regNick.trim() || !regName.trim()) { setRegError("Bitte alle Felder ausfüllen."); return; }
-
-    if (registeredAs) await deleteCurrentPlayer(registeredAs);
 
     const res = await fetch("/api/register", {
       method: "POST",
@@ -297,11 +282,6 @@ export default function App() {
       setAdminScoreInputs({});
     }
     await loadData();
-  };
-
-  const helferLogin = () => {
-    if (helperPw === HELPER_PASSWORD) { setHelperLoginError(""); setView("spielhelfer"); }
-    else { setHelperLoginError("Falsches Passwort!"); }
   };
 
   const adminLogin = () => {
@@ -511,7 +491,7 @@ export default function App() {
           return (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               <div style={{ fontSize: 60, marginBottom: 8 }}>🕹️</div>
-              <div style={{ fontSize: 42, fontWeight: 900, letterSpacing: 6, color: "#00FF41", textShadow: "0 0 30px #00FF41, 0 0 80px #00FF4144" }}>ARCADE EVENT</div>
+              <div style={{ fontSize: 42, fontWeight: 900, letterSpacing: 6, color: "#00FF41", textShadow: "0 0 30px #00FF41, 0 0 80px #00FF4144" }}>RETRO CLASH</div>
               <div style={{ fontSize: 11, letterSpacing: 10, color: "#555", margin: "8px 0 4px" }}>OLDENBURGER COMPUTER MUSEUM</div>
               <div style={{ fontSize: 11, letterSpacing: 6, color: "#333" }}>SPARTE7 E-SPORTS EVENT</div>
 
@@ -713,7 +693,7 @@ export default function App() {
               </div>
               <button
                 style={{ ...s.btn("#FF4444", true), padding: "5px 12px", fontSize: 11, whiteSpace: "nowrap" }}
-                onClick={async () => { if (confirm(`Wirklich abmelden? Dein Gamertag "${registeredAs}" und alle erspielten Punkte werden unwiderruflich gelöscht.`)) { await deleteCurrentPlayer(registeredAs); localStorage.removeItem("retro_gamertag"); setRegisteredAs(null); await loadData(); } }}
+                onClick={() => { if (confirm(`Wirklich abmelden? Dein Gamertag "${registeredAs}" wird von diesem Gerät entfernt.`)) { localStorage.removeItem("retro_gamertag"); setRegisteredAs(null); } }}
               >✕ Abmelden</button>
             </div>
           </div>
@@ -846,25 +826,6 @@ export default function App() {
             {leaderboard.length} SPIELER · {STATIONS.length} STATIONEN
           </div>
         )}
-        <Footer />
-      </div>
-    </div>
-  );
-
-  if (view === "helferLogin") return (
-    <div style={s.app}>
-      <div style={s.bg} />
-      <div style={crtStyle} />
-      <div style={s.wrap}>
-        <div style={{ maxWidth: 360, margin: "60px auto" }}>
-          <div style={s.h2}>🧑‍🔧 Spielhelfer Login</div>
-          <div style={s.card}>
-            <label style={s.label}>Passwort</label>
-            <input style={{ ...s.input, marginBottom: 16 }} type="password" value={helperPw} onChange={(e) => setHelperPw(e.target.value)} placeholder="••••••••" onKeyDown={(e) => e.key === "Enter" && helferLogin()} />
-            {helperLoginError && <div style={{ color: "#FF4444", fontSize: 13, marginBottom: 14 }}>⚠ {helperLoginError}</div>}
-            <button style={s.btn("#00FF41")} onClick={helferLogin}>Einloggen</button>
-          </div>
-        </div>
         <Footer />
       </div>
     </div>
