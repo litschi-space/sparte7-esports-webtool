@@ -1,15 +1,17 @@
 const express = require("express");
 const path = require("path");
 const db = require("./db");
-const { Filter } = require("bad-words");
-
-const profanityFilter = new Filter();
-profanityFilter.addWords(
-  "scheiße", "scheisse", "scheißer", "scheiß", "scheiss",
-  "arsch", "arschloch", "wichser", "wichse", "fick", "ficken",
-  "hurensohn", "hure", "nutte", "fotze", "schwanz", "pimmel",
-  "nazi", "hitler", "neger", "nigger", "kanake"
-);
+const BANNED_WORDS = [
+  "scheiße","scheisse","scheißer","scheiß","scheiss",
+  "arsch","arschloch","wichser","wichse","fick","ficken",
+  "hurensohn","hure","nutte","fotze","schwanz","pimmel",
+  "nazi","hitler","neger","nigger","kanake",
+  "fuck","shit","ass","bitch","cunt","dick","cock","pussy",
+];
+const isProfane = (str) => {
+  const lower = str.toLowerCase();
+  return BANNED_WORDS.some((w) => lower.includes(w));
+};
 
 const app = express();
 const PORT = 3001;
@@ -92,7 +94,7 @@ app.post("/api/register", async (req, res) => {
   if (!gamertag?.trim() || !realname?.trim()) {
     return res.status(400).json({ error: "Bitte alle Felder ausfüllen." });
   }
-  if (profanityFilter.isProfane(gamertag.trim()) || profanityFilter.isProfane(realname.trim())) {
+  if (isProfane(gamertag.trim()) || isProfane(realname.trim())) {
     return res.status(400).json({ error: "Bitte wähle einen angemessenen Namen." });
   }
   const assignedTeam = TEAMS.includes(team) ? team : TEAMS[Math.floor(Math.random() * TEAMS.length)];
