@@ -142,8 +142,8 @@ app.post("/api/score", async (req, res) => {
 app.get("/api/leaderboard", async (req, res) => {
   const { rows: players } = await db.query(`
     SELECT p.id, p.gamertag AS nick, p.realname AS name, p.team,
-           COALESCE(SUM(s.score), 0) AS total,
-           COUNT(s.station) AS stationCount
+           CAST(COALESCE(SUM(s.score), 0) AS INTEGER) AS total,
+           CAST(COUNT(s.station) AS INTEGER) AS "stationCount"
     FROM players p
     LEFT JOIN scores s ON s.player_id = p.id
     GROUP BY p.id, p.gamertag, p.realname, p.team, p.created_at
