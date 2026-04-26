@@ -17,7 +17,6 @@ const STATIONS = [
   { id: 12, name: "Q*bert", game: "Q*bert", color: "#FFA500" },
 ];
 
-const ADMIN_PASSWORD = "museum2024";
 
 const RANKS = ["🥇", "🥈", "🥉"];
 
@@ -70,7 +69,7 @@ export default function App() {
   const isTableMode = window.location.pathname === "/table";
 
   const [view, setView] = useState(
-    isHelperMode ? "spielhelfer" : isAdminMode ? "adminLogin" : isTableMode ? "table" : "home"
+    isHelperMode ? "helferLogin" : isAdminMode ? "adminLogin" : isTableMode ? "table" : "home"
   );
   const [players, setPlayers] = useState([]);
   const [scores, setScores] = useState({}); // { playerId: { stationId: score } }
@@ -90,6 +89,9 @@ export default function App() {
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [adminError, setAdminError] = useState("");
+  const [helferPw, setHelferPw] = useState("");
+  const [helferPwError, setHelferPwError] = useState("");
+  const [helferPassword, setHelferPassword] = useState(""); // gespeichertes PW für API-Calls
 
   // Register form
   const [regNick, setRegNick] = useState("");
@@ -262,7 +264,7 @@ export default function App() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${ADMIN_PASSWORD}`,
+        Authorization: `Bearer ${adminPw}`,
       },
       body: JSON.stringify({ gamertag: player.nick, station: stationId, score: val }),
     });
@@ -276,7 +278,7 @@ export default function App() {
     if (!confirm("Spieler wirklich löschen? Alle Scores werden ebenfalls gelöscht.")) return;
     await fetch(`/api/admin/player/${playerId}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
+      headers: { Authorization: `Bearer ${adminPw}` },
     });
     if (String(playerId) === adminSelectedPlayer) {
       setAdminSelectedPlayer("");
@@ -285,9 +287,16 @@ export default function App() {
     await loadData();
   };
 
-  const adminLogin = () => {
-    if (adminPw === ADMIN_PASSWORD) { setAdminUnlocked(true); setAdminError(""); setView("admin"); }
+  const adminLogin = async () => {
+    const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: adminPw }) });
+    if (res.ok) { setAdminUnlocked(true); setAdminError(""); setView("admin"); }
     else { setAdminError("Falsches Passwort!"); }
+  };
+
+  const helferLogin = async () => {
+    const res = await fetch("/api/helper-login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: helferPw }) });
+    if (res.ok) { setHelferPassword(helferPw); setHelferPwError(""); setView("spielhelfer"); }
+    else { setHelferPwError("Falsches Passwort!"); }
   };
 
   const helperLookupPlayer = () => {
@@ -308,7 +317,7 @@ export default function App() {
 
     await fetch("/api/score", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${helferPassword}` },
       body: JSON.stringify({ gamertag: helperPlayer.nick, station: helperStation.id, score: val }),
     });
 
@@ -934,7 +943,7 @@ export default function App() {
               onClick={async () => {
                 const res = await fetch("/api/admin/event-start", {
                   method: "POST",
-                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${ADMIN_PASSWORD}` },
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminPw}` },
                   body: JSON.stringify({ value: adminEventStart }),
                 });
                 const data = await res.json();
@@ -944,7 +953,7 @@ export default function App() {
             {eventStart && <button style={s.btn("#444")} onClick={async () => {
               const res = await fetch("/api/admin/event-start", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${ADMIN_PASSWORD}` },
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminPw}` },
                 body: JSON.stringify({ value: "" }),
               });
               const data = await res.json();
@@ -966,7 +975,7 @@ export default function App() {
             onClick={async () => {
               const res = await fetch("/api/admin/registration-status", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${ADMIN_PASSWORD}` },
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminPw}` },
                 body: JSON.stringify({ open: !registrationOpen }),
               });
               const data = await res.json();
@@ -1001,7 +1010,7 @@ export default function App() {
             onClick={async () => {
               const res = await fetch("/api/admin/scoring-status", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${ADMIN_PASSWORD}` },
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminPw}` },
                 body: JSON.stringify({ open: !scoringOpen }),
               });
               const data = await res.json();
@@ -1117,6 +1126,25 @@ export default function App() {
                 {players.length === 0 && <tr><td colSpan={6} style={{ padding: 20, textAlign: "center", color: "#444" }}>Noch keine Spieler</td></tr>}
               </tbody>
             </table>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    </div>
+  );
+
+  if (view === "helferLogin") return (
+    <div style={s.app}>
+      <div style={s.bg} />
+      <div style={crtStyle} />
+      <div style={s.wrap}>
+        <div style={{ maxWidth: 360, margin: "60px auto" }}>
+          <div style={s.h2}>🧑‍🔧 Spielhelfer Login</div>
+          <div style={s.card}>
+            <label style={s.label}>Passwort</label>
+            <input style={{ ...s.input, marginBottom: 16 }} type="password" value={helferPw} onChange={(e) => setHelferPw(e.target.value)} placeholder="••••••••" onKeyDown={(e) => e.key === "Enter" && helferLogin()} autoFocus />
+            {helferPwError && <div style={{ color: "#FF4444", fontSize: 13, marginBottom: 14 }}>⚠ {helferPwError}</div>}
+            <button style={s.btn("#00D4FF")} onClick={helferLogin}>Einloggen</button>
           </div>
         </div>
         <Footer />

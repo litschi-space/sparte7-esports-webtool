@@ -18,7 +18,8 @@ const PORT = 3001;
 
 app.use(express.json());
 
-const ADMIN_PASSWORD = "museum2024";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "museum2024";
+const HELPER_PASSWORD = process.env.HELPER_PASSWORD || "helfer2024";
 const TEAMS = ["blau", "gelb", "gruen", "rot"];
 
 function requireAdmin(req, res, next) {
@@ -27,6 +28,25 @@ function requireAdmin(req, res, next) {
   }
   next();
 }
+
+function requireHelper(req, res, next) {
+  if (req.headers["authorization"] !== `Bearer ${HELPER_PASSWORD}`) {
+    return res.status(401).json({ error: "Nicht autorisiert" });
+  }
+  next();
+}
+
+app.post("/api/admin/login", (req, res) => {
+  const { password } = req.body || {};
+  if (password === ADMIN_PASSWORD) return res.json({ ok: true });
+  res.status(401).json({ error: "Falsches Passwort!" });
+});
+
+app.post("/api/helper-login", (req, res) => {
+  const { password } = req.body || {};
+  if (password === HELPER_PASSWORD) return res.json({ ok: true });
+  res.status(401).json({ error: "Falsches Passwort!" });
+});
 
 function formatTime(isoString) {
   if (!isoString) return "";
@@ -129,7 +149,7 @@ app.get("/api/players", async (req, res) => {
 });
 
 // POST /api/score
-app.post("/api/score", async (req, res) => {
+app.post("/api/score", requireHelper, async (req, res) => {
   const scoringRow = await db.queryOne("SELECT value FROM settings WHERE key = ?", ["scoring_open"]);
   if (scoringRow?.value === "false") return res.status(403).json({ error: "Scoring ist aktuell deaktiviert" });
 
