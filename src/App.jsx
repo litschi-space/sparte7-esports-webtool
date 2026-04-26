@@ -86,6 +86,7 @@ export default function App() {
   const [teamScores, setTeamScores] = useState([]);
   const [leaderboardTab, setLeaderboardTab] = useState("spieler"); // "spieler" | "teams"
   const [regTeam, setRegTeam] = useState(null); // gewähltes Team bei Registrierung (null = random)
+  const [howToOpen, setHowToOpen] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [adminError, setAdminError] = useState("");
@@ -464,22 +465,20 @@ export default function App() {
   // ── VIEWS ────────────────────────────────────────────────────────────────────
 
   const NavBar = () => (
-    <div style={{ ...s.navBar, justifyContent: "space-between", alignItems: "center" }}>
+    <div style={{ ...s.navBar, position: "relative", justifyContent: "center" }}>
       <a
         href="https://github.com/litschi-space/sparte7-esports-webtool"
         target="_blank"
         rel="noopener noreferrer"
-        style={{ fontSize: 10, color: "#333", letterSpacing: 1, textDecoration: "none", padding: "4px 8px", border: "1px solid #222", borderRadius: 6, whiteSpace: "nowrap", transition: "color 0.2s, border-color 0.2s" }}
+        style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: "#333", letterSpacing: 1, textDecoration: "none", padding: "4px 8px", border: "1px solid #222", borderRadius: 6, whiteSpace: "nowrap", transition: "color 0.2s, border-color 0.2s" }}
         onMouseEnter={e => { e.currentTarget.style.color = "#00FF41"; e.currentTarget.style.borderColor = "#00FF41"; }}
         onMouseLeave={e => { e.currentTarget.style.color = "#333"; e.currentTarget.style.borderColor = "#222"; }}
       >
         v{__APP_VERSION__}
       </a>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button style={s.btn(view === "home" ? "#00FF41" : "#444", view !== "home")} onClick={() => setView("home")}>🏠 Home</button>
-        <button style={s.btn(view === "register" ? "#00D4FF" : "#444", view !== "register")} onClick={() => setView("register")}>➕ Registrieren</button>
-        <button style={s.btn(view === "leaderboard" ? "#FFD700" : "#444", view !== "leaderboard")} onClick={() => setView("leaderboard")}>🏆 Leaderboard</button>
-      </div>
+      <button style={s.btn(view === "home" ? "#00FF41" : "#444", view !== "home")} onClick={() => setView("home")}>🏠 Home</button>
+      <button style={s.btn(view === "register" ? "#00D4FF" : "#444", view !== "register")} onClick={() => setView("register")}>➕ Registrieren</button>
+      <button style={s.btn(view === "leaderboard" ? "#FFD700" : "#444", view !== "leaderboard")} onClick={() => setView("leaderboard")}>🏆 Leaderboard</button>
     </div>
   );
 
@@ -585,11 +584,21 @@ export default function App() {
               </div>
 
               {!me && (
-                <div style={{ marginTop: 48, padding: "20px 24px", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", maxWidth: 480, margin: "48px auto 0" }}>
-                  <div style={{ fontSize: 11, letterSpacing: 3, color: "#888", marginBottom: 12 }}>SO FUNKTIONIERT'S</div>
-                  {["1. Registriere dich mit deinem Gamertag", "2. Spiele eine der 12 Retrospiele", "3. Melde deinen Score sofort beim Stationshelfer", "4. Spiele so viele Spiele wie möglich", "5. Wer die meisten Punkte sammeln kann, gewinnt die Ähre!"].map((t) => (
-                    <div key={t} style={{ fontSize: 13, color: "#aaa", marginBottom: 6, textAlign: "left" }}>▶ {t}</div>
-                  ))}
+                <div style={{ marginTop: 48, maxWidth: 480, margin: "48px auto 0", background: "rgba(255,255,255,0.03)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <button
+                    onClick={() => setHowToOpen(o => !o)}
+                    style={{ width: "100%", background: "none", border: "none", cursor: "pointer", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                  >
+                    <span style={{ fontSize: 11, letterSpacing: 3, color: "#888" }}>SO FUNKTIONIERT'S</span>
+                    <span style={{ color: "#555", fontSize: 14, transition: "transform 0.2s", display: "inline-block", transform: howToOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+                  </button>
+                  {howToOpen && (
+                    <div style={{ padding: "0 20px 16px" }}>
+                      {["1. Registriere dich mit deinem Gamertag", "2. Spiele eine der 12 Retrospiele", "3. Melde deinen Score sofort beim Stationshelfer", "4. Spiele so viele Spiele wie möglich", "5. Wer die meisten Punkte sammeln kann, gewinnt die Ähre!"].map((t) => (
+                        <div key={t} style={{ fontSize: 13, color: "#aaa", marginBottom: 6, textAlign: "left" }}>▶ {t}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
