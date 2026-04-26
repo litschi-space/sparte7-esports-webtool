@@ -85,11 +85,11 @@ app.post("/api/register", async (req, res) => {
   }
   const assignedTeam = TEAMS.includes(team) ? team : TEAMS[Math.floor(Math.random() * TEAMS.length)];
   try {
-    const { lastInsertId } = await db.run(
-      "INSERT INTO players (gamertag, realname, team) VALUES (?, ?, ?)",
+    const { rows } = await db.query(
+      "INSERT INTO players (gamertag, realname, team) VALUES (?, ?, ?) RETURNING *",
       [gamertag.trim(), realname.trim(), assignedTeam]
     );
-    const player = await db.queryOne("SELECT * FROM players WHERE id = ?", [lastInsertId]);
+    const player = rows[0];
     res.json({
       id: player.id,
       nick: player.gamertag,
