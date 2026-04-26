@@ -2,12 +2,9 @@ const express = require("express");
 const path = require("path");
 const db = require("./db");
 const BANNED_WORDS = [
-  "scheiße","scheisse","scheißer","scheiß","scheiss",
-  "arsch","arschloch","wichser","wichse","fick","ficken",
-  "hurensohn","hure","nutte","fotze","schwanz","pimmel",
-  "nazi","hitler","neger","nigger","kanake",
-  "fuck","shit","ass","bitch","cunt","dick","cock","pussy",
-];
+  ...require("fs").readFileSync(require("path").join(__dirname, "badwords/de.txt"), "utf8").split("\n"),
+  ...require("fs").readFileSync(require("path").join(__dirname, "badwords/en.txt"), "utf8").split("\n"),
+].map((w) => w.trim().toLowerCase()).filter(Boolean);
 const isProfane = (str) => {
   const lower = str.toLowerCase();
   return BANNED_WORDS.some((w) => lower.includes(w));

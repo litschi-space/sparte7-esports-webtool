@@ -464,10 +464,22 @@ export default function App() {
   // ── VIEWS ────────────────────────────────────────────────────────────────────
 
   const NavBar = () => (
-    <div style={s.navBar}>
-      <button style={s.btn(view === "home" ? "#00FF41" : "#444", view !== "home")} onClick={() => setView("home")}>🏠 Home</button>
-      <button style={s.btn(view === "register" ? "#00D4FF" : "#444", view !== "register")} onClick={() => setView("register")}>➕ Registrieren</button>
-      <button style={s.btn(view === "leaderboard" ? "#FFD700" : "#444", view !== "leaderboard")} onClick={() => setView("leaderboard")}>🏆 Leaderboard</button>
+    <div style={{ ...s.navBar, justifyContent: "space-between", alignItems: "center" }}>
+      <a
+        href="https://github.com/litschi-space/sparte7-esports-webtool"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ fontSize: 10, color: "#333", letterSpacing: 1, textDecoration: "none", padding: "4px 8px", border: "1px solid #222", borderRadius: 6, whiteSpace: "nowrap", transition: "color 0.2s, border-color 0.2s" }}
+        onMouseEnter={e => { e.currentTarget.style.color = "#00FF41"; e.currentTarget.style.borderColor = "#00FF41"; }}
+        onMouseLeave={e => { e.currentTarget.style.color = "#333"; e.currentTarget.style.borderColor = "#222"; }}
+      >
+        v{__APP_VERSION__}
+      </a>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button style={s.btn(view === "home" ? "#00FF41" : "#444", view !== "home")} onClick={() => setView("home")}>🏠 Home</button>
+        <button style={s.btn(view === "register" ? "#00D4FF" : "#444", view !== "register")} onClick={() => setView("register")}>➕ Registrieren</button>
+        <button style={s.btn(view === "leaderboard" ? "#FFD700" : "#444", view !== "leaderboard")} onClick={() => setView("leaderboard")}>🏆 Leaderboard</button>
+      </div>
     </div>
   );
 
@@ -779,8 +791,14 @@ export default function App() {
             <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>5. Verhalten</strong><br />
             Gamertags müssen angemessen und respektvoll sein. Beleidigende, diskriminierende oder obszöne Namen führen zum Ausschluss von der Teilnahme.</p>
 
-            <p><strong style={{ color: "#ccc" }}>6. Veranstalter</strong><br />
-            Computer Museum Oldenburg – Sparte 7 e.V.</p>
+            <p style={{ marginBottom: 24 }}><strong style={{ color: "#ccc" }}>6. Veranstalter</strong><br />
+            Computer Museum Oldenburg e.V.<br />
+            Sparte 7 – Oldenburgisches Staatstheater</p>
+
+            <div style={{ borderTop: "1px solid #222", paddingTop: 16, fontSize: 12, color: "#555" }}>
+              Weitere rechtliche Informationen findest du in unserem{" "}
+              <a href="https://litschi.space/Impressum.html" target="_blank" rel="noopener noreferrer" style={{ color: "#00FF41", textDecoration: "underline" }}>Impressum</a>.
+            </div>
           </div>
         </div>
         <Footer />
