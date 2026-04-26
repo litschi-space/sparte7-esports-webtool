@@ -7,7 +7,10 @@ const BANNED_WORDS = [
 ].map((w) => w.trim().toLowerCase()).filter(Boolean);
 const isProfane = (str) => {
   const lower = str.toLowerCase();
-  return BANNED_WORDS.some((w) => lower.includes(w));
+  return BANNED_WORDS.some((w) => {
+    const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}\\b`).test(lower);
+  });
 };
 
 const app = express();
