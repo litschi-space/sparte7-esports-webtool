@@ -1,6 +1,15 @@
 const express = require("express");
 const path = require("path");
 const db = require("./db");
+const { Filter } = require("bad-words");
+
+const profanityFilter = new Filter();
+profanityFilter.addWords(
+  "scheiße", "scheisse", "scheißer", "scheiß", "scheiss",
+  "arsch", "arschloch", "wichser", "wichse", "fick", "ficken",
+  "hurensohn", "hure", "nutte", "fotze", "schwanz", "pimmel",
+  "nazi", "hitler", "neger", "nigger", "kanake"
+);
 
 const app = express();
 const PORT = 3001;
@@ -82,6 +91,9 @@ app.post("/api/register", async (req, res) => {
   const { gamertag, realname, team } = req.body || {};
   if (!gamertag?.trim() || !realname?.trim()) {
     return res.status(400).json({ error: "Bitte alle Felder ausfüllen." });
+  }
+  if (profanityFilter.isProfane(gamertag.trim()) || profanityFilter.isProfane(realname.trim())) {
+    return res.status(400).json({ error: "Bitte wähle einen angemessenen Namen." });
   }
   const assignedTeam = TEAMS.includes(team) ? team : TEAMS[Math.floor(Math.random() * TEAMS.length)];
   try {
@@ -194,6 +206,14 @@ app.post("/api/admin/score", requireAdmin, async (req, res) => {
        SET score = excluded.score, updated_at = CURRENT_TIMESTAMP`,
     [player.id, st, val]
   );
+  res.json({ ok: true });
+});
+
+// DELETE /api/unregister
+app.delete("/api/unregister", async (req, res) => {
+  const { gamertag } = req.body || {};
+  if (!gamertag?.trim()) return res.status(400).json({ error: "Kein Gamertag angegeben" });
+  await db.run("DELETE FROM players WHERE gamertag = ?", [gamertag.trim()]);
   res.json({ ok: true });
 });
 

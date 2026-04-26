@@ -518,7 +518,7 @@ export default function App() {
                       <div style={{ fontSize: 22, fontWeight: 900, color: myTeam?.color || "#00FF41" }}>{me.nick}</div>
                       <div style={{ fontSize: 12, color: "#555" }}>{me.name}</div>
                     </div>
-                    <div style={{ fontSize: 36, fontWeight: 900 }}>
+                    <div className={myRank === 0 ? "badge-gold" : myRank === 1 ? "badge-silver" : myRank === 2 ? "badge-bronze" : ""} style={{ fontSize: 36, fontWeight: 900 }}>
                       {RANKS[myRank] || `#${myRank + 1}`}
                     </div>
                   </div>
@@ -693,7 +693,7 @@ export default function App() {
               </div>
               <button
                 style={{ ...s.btn("#FF4444", true), padding: "5px 12px", fontSize: 11, whiteSpace: "nowrap" }}
-                onClick={() => { if (confirm(`Wirklich abmelden? Dein Gamertag "${registeredAs}" wird von diesem Gerät entfernt.`)) { localStorage.removeItem("retro_gamertag"); setRegisteredAs(null); } }}
+                onClick={async () => { if (confirm(`Wirklich abmelden? Dein Account "${registeredAs}" wird aus der Rangliste entfernt.`)) { await fetch("/api/unregister", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gamertag: registeredAs }) }); localStorage.removeItem("retro_gamertag"); setRegisteredAs(null); } }}
               >✕ Abmelden</button>
             </div>
           </div>
@@ -733,8 +733,9 @@ export default function App() {
           {regError && <div style={{ color: "#FF4444", fontSize: 13, marginBottom: 16 }}>⚠ {regError}</div>}
           <button style={{ ...s.btn("#00FF41"), opacity: registrationOpen ? 1 : 0.3, cursor: registrationOpen ? "pointer" : "not-allowed" }} onClick={registrationOpen ? registerPlayer : undefined}>🎮 Registrieren & Starten</button>
           <div style={{ fontSize: 11, color: "#444", marginTop: 16, lineHeight: 1.6 }}>
-            🔒 Alle Daten werden sorgfältig behandelt, werden nach der Veranstaltung umgehend gelöscht und dienen ausschließlich zum Zuordnen der Punktestände.<br />
-            Bitte beachte, dass dein Vorname für unsere Spielleitung sichtbar ist, um eine korrekte Zuordnung sicherstellen zu können.
+            🔒 Mit dem Registrieren stimmst du den{" "}
+            <span onClick={() => setView("tos")} style={{ color: "#00FF41", cursor: "pointer", textDecoration: "underline" }}>Nutzungsbedingungen</span>
+            {" "}zu. Deine Daten werden nach der Veranstaltung gelöscht.
           </div>
         </div>
 
@@ -755,6 +756,37 @@ export default function App() {
     </div>
   );
 
+
+  if (view === "tos") return (
+    <div style={s.app}>
+      <div style={s.container}>
+        <div style={s.card}>
+          <button onClick={() => setView("register")} style={{ background: "none", border: "none", color: "#555", fontSize: 13, cursor: "pointer", marginBottom: 20, padding: 0, letterSpacing: 1 }}>← Zurück zur Registrierung</button>
+          <div style={s.h2}>Nutzungsbedingungen</div>
+          <div style={{ color: "#888", fontSize: 13, lineHeight: 1.8, marginTop: 16 }}>
+            <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>1. Teilnahme</strong><br />
+            Die Nutzung dieses Systems ist ausschließlich im Rahmen der Veranstaltung „Retro Clash" im Computer Museum Oldenburg gestattet. Die Teilnahme ist freiwillig.</p>
+
+            <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>2. Gespeicherte Daten</strong><br />
+            Bei der Registrierung werden dein Gamertag (frei wählbarer Nickname) sowie dein Vorname gespeichert. Diese Angaben sind für die Spielleitung und auf dem Leaderboard sichtbar.</p>
+
+            <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>3. Zweck der Datenspeicherung</strong><br />
+            Die Daten dienen ausschließlich der Zuordnung von Punkteständen während der Veranstaltung. Eine Weitergabe an Dritte findet nicht statt.</p>
+
+            <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>4. Löschung</strong><br />
+            Alle gespeicherten Daten werden unmittelbar nach Ende der Veranstaltung vollständig gelöscht.</p>
+
+            <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>5. Verhalten</strong><br />
+            Gamertags müssen angemessen und respektvoll sein. Beleidigende, diskriminierende oder obszöne Namen führen zum Ausschluss von der Teilnahme.</p>
+
+            <p><strong style={{ color: "#ccc" }}>6. Veranstalter</strong><br />
+            Computer Museum Oldenburg – Sparte 7 e.V.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    </div>
+  );
 
   if (view === "leaderboard") return (
     <div style={s.app}>
