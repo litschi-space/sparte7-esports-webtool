@@ -33,6 +33,16 @@ const Footer = () => (
     <p style={{ fontWeight: 700, letterSpacing: 4, color: "#777777", marginBottom: 6 }}>SPARTE7 ✖ OCM e.V.</p>
     <p style={{ marginBottom: 6 }}></p>
     <p style={{ marginBottom: 6 }}>Erstellt mit <span style={{ animation: "heartColor 5s linear infinite", fontSize: 16, display: "inline-block", transform: "scaleX(1.3)" }}>♥</span> von Richard Schneider</p>
+    <p style={{ marginBottom: 8 }}>
+      <a
+        href="https://litschi.space/report.html?page=esport.sparte7.de"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: "#555", fontSize: 11, letterSpacing: 1, textDecoration: "none", border: "1px solid #333", borderRadius: 5, padding: "3px 10px" }}
+        onMouseEnter={e => { e.currentTarget.style.color = "#ff4d4d"; e.currentTarget.style.borderColor = "#ff4d4d"; }}
+        onMouseLeave={e => { e.currentTarget.style.color = "#555"; e.currentTarget.style.borderColor = "#333"; }}
+      >🐛 Bug melden</a>
+    </p>
     <p style={{ marginBottom: 12 }}>©2026 | <a href="https://litschi.space/Impressum.html" style={{ color: "#555", textDecoration: "underline" }}>Impressum</a> | <a href="https://litschi.space/" style={{ color: "#33ffe493" }}>litschi.space</a></p>
     <p>🏳️‍🌈</p>
   </footer>
@@ -487,7 +497,7 @@ export default function App() {
       </a>
       <button style={s.btn(view === "home" ? "#00FF41" : "#444", view !== "home")} onClick={() => setView("home")}>🏠 Home</button>
       <button style={s.btn(view === "register" ? "#00D4FF" : "#444", view !== "register")} onClick={() => setView("register")}>➕ Registrieren</button>
-      <button style={s.btn(view === "leaderboard" ? "#FFD700" : "#444", view !== "leaderboard")} onClick={() => setView("leaderboard")}>🏆 Leaderboard</button>
+      <button style={s.btn(view === "leaderboard" ? "#FFD700" : "#444", view !== "leaderboard")} onClick={() => setView("leaderboard")}>🏆 Rangliste</button>
     </div>
   );
 
@@ -511,7 +521,7 @@ export default function App() {
           return (
             <div style={{ textAlign: "center", padding: "40px 0" }}>
               <div style={{ fontSize: 60, marginBottom: 8 }}>🕹️</div>
-              <div style={{ fontSize: 42, fontWeight: 900, letterSpacing: 6, color: "#00FF41", textShadow: "0 0 30px #00FF41, 0 0 80px #00FF4144" }}>RETRO CLASH</div>
+              <div style={{ fontSize: 42, fontWeight: 900, letterSpacing: 6, color: "#00FF41", textShadow: "0 0 30px #00FF41, 0 0 80px #00FF4144" }}>RETRO ARCADE</div>
               <div style={{ fontSize: 11, letterSpacing: 10, color: "#555", margin: "8px 0 4px" }}>OLDENBURGER COMPUTER MUSEUM</div>
               <div style={{ fontSize: 11, letterSpacing: 6, color: "#333" }}>SPARTE7 E-SPORTS EVENT</div>
 
@@ -795,7 +805,7 @@ export default function App() {
           <div style={s.h2}>Nutzungsbedingungen</div>
           <div style={{ color: "#888", fontSize: 13, lineHeight: 1.8, marginTop: 16 }}>
             <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>1. Teilnahme</strong><br />
-            Die Nutzung dieses Systems ist ausschließlich im Rahmen der Veranstaltung „Retro Clash" im Computer Museum Oldenburg gestattet. Die Teilnahme ist freiwillig.</p>
+            Die Nutzung dieses Systems ist ausschließlich im Rahmen der Veranstaltung „Retro Arcade" im Computer Museum Oldenburg gestattet. Die Teilnahme ist freiwillig.</p>
 
             <p style={{ marginBottom: 12 }}><strong style={{ color: "#ccc" }}>2. Gespeicherte Daten</strong><br />
             Bei der Registrierung werden dein Gamertag (frei wählbarer Nickname) sowie dein Vorname gespeichert. Diese Angaben sind für die Spielleitung und auf dem Leaderboard sichtbar.</p>
