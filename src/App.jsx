@@ -9,10 +9,10 @@ const STATIONS = [
   { id: 4, name: "Tetris", game: "Tetris", color: "#00D4FF" },
   { id: 5, name: "Landung auf dem Jupiter", game: "Landung auf dem Jupiter", color: "#FF00FF" },
   { id: 6, name: "Super Mario Bros 1", game: "Super Mario Bros 1", color: "#7FFF00" },
-  { id: 7, name: "Centipede", game: "Centipede", color: "#FF4444" },
+  { id: 7, name: "Dyna Blaster", game: "Dyna Blaster", color: "#FF4444" },
   { id: 8, name: "Mine Storm", game: "Mine Storm", color: "#AAAAFF" },
   { id: 10, name: "Donkey Konga", game: "Donkey Konga", color: "#00FFCC" },
-  { id: 11, name: "Arkenoid", game: "Arkenoid", color: "#FF69B4" },
+  { id: 11, name: "Arkanoid", game: "Arkanoid", color: "#FF69B4" },
 ];
 
 
