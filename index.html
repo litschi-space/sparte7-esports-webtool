@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RETRO CLASH – Computer Museum Oldenburg</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #0a0a0f; }
+
+      @keyframes pulse-gold {
+        0%, 100% { filter: drop-shadow(0 0 8px #FFD700) drop-shadow(0 0 20px #FFD700); transform: scale(1); }
+        50%       { filter: drop-shadow(0 0 18px #FFD700) drop-shadow(0 0 40px #FFA500); transform: scale(1.18); }
+      }
+      @keyframes pulse-silver {
+        0%, 100% { filter: drop-shadow(0 0 6px #C0C0C0) drop-shadow(0 0 14px #C0C0C0); transform: scale(1); }
+        50%       { filter: drop-shadow(0 0 14px #C0C0C0) drop-shadow(0 0 28px #E8E8E8); transform: scale(1.12); }
+      }
+      @keyframes pulse-bronze {
+        0%, 100% { filter: drop-shadow(0 0 5px #CD7F32) drop-shadow(0 0 12px #CD7F32); transform: scale(1); }
+        50%       { filter: drop-shadow(0 0 10px #CD7F32) drop-shadow(0 0 22px #E8954A); transform: scale(1.09); }
+      }
+      .badge-gold   { display: inline-block; animation: pulse-gold   2s   ease-in-out infinite; }
+      .badge-silver { display: inline-block; animation: pulse-silver 2.6s ease-in-out infinite; }
+      .badge-bronze { display: inline-block; animation: pulse-bronze 3.2s ease-in-out infinite; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

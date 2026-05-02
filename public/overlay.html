@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retro Clash – Overlay</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* Transparenter Hintergrund für OBS */
+    html, body {
+      background: transparent;
+      font-family: 'Courier New', monospace;
+      width: 420px;
+    }
+
+    #overlay {
+      padding: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .header-icon { font-size: 20px; }
+    .header-title {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 5px;
+      color: #00FF41;
+      text-shadow: 0 0 12px #00FF41, 0 0 30px #00FF4166;
+      text-transform: uppercase;
+    }
+    .header-sub {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: #555;
+    }
+
+    .entry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.72);
+      border-left: 3px solid transparent;
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.4s ease;
+    }
+    .entry.rank-1 { border-left-color: #FFD700; background: rgba(255,215,0,0.10); }
+    .entry.rank-2 { border-left-color: #C0C0C0; background: rgba(192,192,192,0.08); }
+    .entry.rank-3 { border-left-color: #CD7F32; background: rgba(205,127,50,0.08); }
+
+    .rank {
+      font-size: 20px;
+      min-width: 30px;
+      text-align: center;
+    }
+    .rank-num {
+      font-size: 15px;
+      font-weight: 900;
+      color: #555;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .team-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.15);
+    }
+
+    .info { flex: 1; }
+    .nick {
+      font-size: 20px;
+      font-weight: 900;
+      color: #e0e0e0;
+      letter-spacing: 1px;
+    }
+    .entry.rank-1 .nick { color: #FFD700; text-shadow: 0 0 8px #FFD70088; }
+    .stations { display: none; }
+
+    .score {
+      text-align: right;
+    }
+    .score-val {
+      font-size: 18px;
+      font-weight: 900;
+      color: #e0e0e0;
+    }
+    .entry.rank-1 .score-val { color: #FFD700; text-shadow: 0 0 10px #FFD700; }
+    .score-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: #444;
+    }
+
+    .dots {
+      display: flex;
+      gap: 3px;
+      margin-top: 4px;
+      justify-content: flex-end;
+    }
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 1px;
+    }
+
+    .empty {
+      font-size: 12px;
+      color: #333;
+      letter-spacing: 3px;
+      padding: 20px 14px;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <div class="header">
+      <span class="header-icon">🕹️</span>
+      <div>
+        <div class="header-title">Retro Clash</div>
+        <div class="header-sub">LIVE LEADERBOARD</div>
+      </div>
+    </div>
+    <div id="entries"></div>
+  </div>
+
+  <script>
+    // Anzahl angezeigter Plätze – per URL-Parameter anpassbar: ?top=3
+    const params = new URLSearchParams(location.search);
+    const TOP = parseInt(params.get('top')) || 5;
+
+    const STATIONS = [
+      { id: 1, color: '#FFD700' }, { id: 2, color: '#00FF41' },
+      { id: 3, color: '#FF6B35' }, { id: 4, color: '#00D4FF' },
+      { id: 5, color: '#FF00FF' }, { id: 6, color: '#7FFF00' },
+      { id: 7, color: '#FF4444' }, { id: 8, color: '#AAAAFF' },
+      { id: 9, color: '#FF8C00' }, { id: 10, color: '#00FFCC' },
+      { id: 11, color: '#FF69B4' }, { id: 12, color: '#FFA500' },
+    ];
+
+    const MEDALS = ['🥇', '🥈', '🥉'];
+
+    const TEAMS = {
+      blau:  '#00D4FF',
+      gelb:  '#FFD700',
+      gruen: '#00FF41',
+      rot:   '#FF4444',
+    };
+
+    let prevNicks = [];
+
+    async function refresh() {
+      try {
+        const res = await fetch('/api/leaderboard');
+        const data = await res.json();
+        render(data.slice(0, TOP));
+      } catch (e) {
+        // Server nicht erreichbar – still bleiben
+      }
+    }
+
+    function render(players) {
+      const el = document.getElementById('entries');
+
+      if (players.length === 0) {
+        el.innerHTML = '<div class="empty">NOCH KEINE SPIELER</div>';
+        prevNicks = [];
+        return;
+      }
+
+      const newNicks = players.map(p => p.nick);
+
+      players.forEach((p, i) => {
+        const id = 'e_' + p.nick.replace(/[^a-zA-Z0-9]/g, '_');
+        const rankClass = i < 3 ? `rank-${i + 1}` : '';
+        const rankHtml = i < 3
+          ? `<div class="rank">${MEDALS[i]}</div>`
+          : `<div class="rank-num">${i + 1}.</div>`;
+        const dotsHtml = STATIONS.map(st => {
+          const done = p.scores && p.scores[st.id] !== undefined;
+          return `<div class="dot" style="background:${done ? st.color : 'rgba(255,255,255,0.08)'}"></div>`;
+        }).join('');
+        const teamColor = TEAMS[p.team] || 'rgba(255,255,255,0.15)';
+
+        let entry = document.getElementById(id);
+
+        if (!entry) {
+          // Neuer Spieler → Element erstellen und einblenden
+          entry = document.createElement('div');
+          entry.id = id;
+          entry.innerHTML = `
+            <div class="rank-wrap"></div>
+            <div class="team-dot"></div>
+            <div class="info">
+              <div class="nick">${escHtml(p.nick)}</div>
+              <div class="stations"></div>
+            </div>
+            <div class="score">
+              <div class="score-val"></div>
+              <div class="score-label">PTS</div>
+              <div class="dots"></div>
+            </div>`;
+          el.appendChild(entry);
+          // Animation nur beim ersten Einblenden
+          entry.style.animation = 'none';
+          entry.offsetHeight;
+          entry.style.animation = '';
+        }
+
+        // Klasse + Rang aktualisieren
+        entry.className = `entry ${rankClass}`;
+        entry.querySelector('.rank-wrap').innerHTML = rankHtml;
+        const dot = entry.querySelector('.team-dot');
+        if (dot) { dot.style.background = teamColor; dot.style.boxShadow = `0 0 6px ${teamColor}`; }
+
+        // Werte in-place updaten – keine Animation
+        entry.querySelector('.stations').textContent = `${p.stationCount}/12 STATIONEN`;
+        entry.querySelector('.score-val').textContent = p.total.toLocaleString('de-DE');
+        entry.querySelector('.dots').innerHTML = dotsHtml;
+
+        // Richtige Reihenfolge sicherstellen
+        if (Array.from(el.children).indexOf(entry) !== i) {
+          el.insertBefore(entry, el.children[i] || null);
+        }
+      });
+
+      // Spieler entfernen die nicht mehr in der Liste sind
+      Array.from(el.children).forEach(child => {
+        if (!newNicks.some(n => 'e_' + n.replace(/[^a-zA-Z0-9]/g, '_') === child.id)) {
+          el.removeChild(child);
+        }
+      });
+
+      prevNicks = newNicks;
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    refresh();
+    setInterval(refresh, 5000);
+  </script>
+</body>
+</html>
